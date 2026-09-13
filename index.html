@@ -1,0 +1,21 @@
+<!doctype html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Beat AI — Venlaza</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f5f8;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app{max-width:520px;margin:auto;padding:24px 18px;text-align:center}.logo{font-weight:800;letter-spacing:.08em;color:#667085;font-size:13px}
+h1{font-size:34px;margin:8px 0 2px}.tag{color:#667085}.status{min-height:28px;margin:14px 0;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.cell{aspect-ratio:1;border:0;border-radius:20px;background:#e4e7ec;font-size:34px;font-weight:800;touch-action:manipulation}
+.cell.active{background:#22c55e;color:white;box-shadow:0 0 0 5px #22c55e33}.cell.wrong{background:#ef4444;color:white}
+#start{width:100%;margin-top:18px;padding:15px;border:0;border-radius:14px;background:#111827;color:white;font-size:17px;font-weight:800}
+.card{background:white;border-radius:18px;padding:16px;margin-top:18px}.row{display:flex;justify-content:space-between;padding:7px;color:#475467}.big{font-size:34px;font-weight:900;color:#111827}.comment{font-weight:700;margin-top:10px}.note{font-size:12px;color:#98a2b3;margin-top:10px}
+</style></head><body><main class="app"><div class="logo">VENLAZA</div><h1>🤖 Beat AI</h1><div class="tag">Can you beat the AI?</div>
+<div id="status" class="status">Tap Start. Three targets.</div><div id="grid" class="grid"></div><button id="start">START</button>
+<section class="card"><div class="row"><span>Your average</span><strong id="avg">—</strong></div><div class="row"><span>AI benchmark</span><strong>220 ms</strong></div><div class="row"><span>Beat AI Score</span><strong id="score" class="big">—</strong></div><div id="comment" class="comment">Your result will appear here.</div><div class="note">Game score only; not a medical or cognitive assessment.</div></section></main>
+<script>
+const grid=document.getElementById('grid'),cells=[];for(let n=1;n<=9;n++){let b=document.createElement('button');b.className='cell';b.textContent=n;b.disabled=true;grid.appendChild(b);cells.push(b)}
+const AI=220;let target=-1,round=0,times=[],running=false,startTime=0;
+function clear(){cells.forEach(c=>c.classList.remove('active','wrong'))}
+function next(){if(round===3)return finish();clear();target=Math.floor(Math.random()*9);cells[target].classList.add('active');startTime=performance.now();round++}
+function finish(){running=false;clear();cells.forEach(c=>c.disabled=true);let avg=times.reduce((a,b)=>a+b,0)/times.length;let score=Math.max(0,Math.min(5,Math.round((AI/avg*5)*100)/100));document.getElementById('avg').textContent=Math.round(avg)+' ms';document.getElementById('score').textContent=score.toFixed(2)+' / 5';document.getElementById('status').textContent='Challenge complete.';document.getElementById('start').textContent='PLAY AGAIN';document.getElementById('comment').textContent=score>=4.8?'🔥 Outstanding — you clearly beat the AI.':score>=4.2?'🎯 Excellent reaction — you beat the AI benchmark.':score>=3.5?'⚡ Nice run — you are getting close to the AI benchmark.':'🚀 Good start — play again and chase a faster average.'}
+cells.forEach((c,i)=>c.onclick=()=>{if(!running||i!==target)return;times.push(Math.round(performance.now()-startTime));c.classList.remove('active');if(round<3)setTimeout(next,180);else finish()});
+document.getElementById('start').onclick=()=>{times=[];round=0;running=true;document.getElementById('avg').textContent='—';document.getElementById('score').textContent='—';document.getElementById('comment').textContent='Get ready…';document.getElementById('status').textContent='Watch the green number and hit it!';document.getElementById('start').textContent='PLAYING…';cells.forEach(c=>c.disabled=false);setTimeout(next,650)}
+</script></body></html>
